@@ -1,0 +1,168 @@
+{
+  "id": "077011c0-8f20-11e7-9c44-c3e20bdea24c",
+  "name": "RunOpenCoverTask",
+  "friendlyName": "Run OpenCover",
+  "description": "Runs VSTest under OpenCover",
+  "author": "Christian Klutz",
+  "helpMarkDown": "Replace with markdown to show in help",
+  "category": "Test",
+  "visibility": [
+    "Build"
+  ],
+  "runsOn": [
+    "Agent",
+    "MachineGroup"
+  ],
+  "demands": [
+    "vstest"
+  ],
+  "version": {
+    "Major": "0",
+    "Minor": "2",
+    "Patch": "0"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "Tests/Coverage - $(testAssembly)",
+  "groups": [
+    {
+      "name": "executionOptions",
+      "displayName": "Execution Options",
+      "isExpanded": true
+    },
+    {
+      "name": "reportingOptions",
+      "displayName": "Reporting Options",
+      "isExpanded": false
+    },
+    {
+      "name": "advancedExecutionOptions",
+      "displayName": "Advanced Execution Options",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "sourcesDirectory",
+      "type": "filePath",
+      "label": "Sources Directory",
+      "defaultValue": "$(build.sourcesDirectory)",
+      "required": true,
+      "helpMarkDown": "The root directory of your sources."
+    },
+    {
+      "name": "testAssembly",
+      "type": "string",
+      "label": "Test Assembly",
+      "defaultValue": "**\\*test*.dll;-:**\\obj\\**",
+      "required": true,
+      "helpMarkDown": "Test binaries to run tests on. Wildcards can be used.  For example, `**\\*test*.dll;-:**\\obj\\**` for all dlls with test in name while excluding files in any sub-directory named obj.",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "testFiltercriteria",
+      "type": "string",
+      "label": "Test Filter criteria",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Additional criteria to filter tests from Test assemblies. For example: Priority=1|Name=MyTestMethod",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "openCoverFilters",
+      "type": "string",
+      "label": "OpenCover Filter criteria",
+      "defaultValue": "+[*]*",
+      "required": false,
+      "helpMarkDown": "Additional criteria to filter what OpenCover considers.",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "disableCodeCoverage",
+      "type": "boolean",
+      "label": "OpenCover Filter criteria",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Additional criteria to filter what OpenCover considers.",
+      "groupName": "executionOptions"
+    },
+
+    {
+      "name": "vsTestCommand",
+      "type": "string",
+      "label": "Path to vstest.console.exe",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Optionally supply the path to VSTest.",
+      "groupName": "advancedExecutionOptions"
+    },
+    {
+      "name": "testAdapterPath",
+      "type": "string",
+      "label": "Path to Custom Test Adapters",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Directory path to custom test adapters.",
+      "groupName":"advancedExecutionOptions"
+    },
+    {
+      "name": "testAdditionalCommandLine",
+      "type": "string",
+      "label": "Additional VSTest Options",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Other Console options that can be passed to vstest.console.exe.",
+      "groupName":"advancedExecutionOptions"
+    },
+    {
+      "name": "openCoverAdditionalCommandLine",
+      "type": "string",
+      "label": "Additional OpenCover Options",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Other Console options that can be passed to opencover.console.exe.",
+      "groupName":"advancedExecutionOptions"
+    },
+
+    {
+      "name": "testRunTitle",
+      "type": "string",
+      "label": "Test Run Title",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Provide a name for the Test Run.",
+      "groupName": "reportingOptions"
+    },
+    {
+      "name": "platform", 
+      "type": "string", 
+      "label": "Platform", 
+      "defaultValue":"", 
+      "required":false,
+      "helpMarkDown": "Platform against which the tests should be reported. If you have defined a variable for platform in your build task, use that here.",
+      "groupName": "reportingOptions"
+    },
+    {
+      "name": "configuration", 
+      "type": "string", 
+      "label": "Configuration", 
+      "defaultValue":"", 
+      "required":false, 
+      "helpMarkDown": "Configuration against which the tests should be reported. If you have defined a variable for configuration in your build task, use that here.",
+      "groupName": "reportingOptions"
+    },
+    {
+        "name": "publishRunAttachments",
+        "type": "boolean",
+        "label": "Upload Test Attachments",
+        "defaultValue": "true",
+        "required": false,
+        "helpMarkDown": "Opt in/out of publishing test run level attachments.",
+        "groupName": "reportingOptions"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "RunOpenCoverTask.ps1"
+    }
+  }
+}

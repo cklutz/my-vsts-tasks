@@ -1,0 +1,166 @@
+{
+  "id": "077011c0-8f20-11e7-9c44-c3e20bdea24c",
+  "name": "RunOpenCoverTask",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "author": "Christian Klutz",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Test",
+  "visibility": [
+    "Build"
+  ],
+  "runsOn": [
+    "Agent",
+    "MachineGroup"
+  ],
+  "demands": [
+    "vstest"
+  ],
+  "version": {
+    "Major": "0",
+    "Minor": "2",
+    "Patch": "0"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "groups": [
+    {
+      "name": "executionOptions",
+      "displayName": "ms-resource:loc.group.displayName.executionOptions",
+      "isExpanded": true
+    },
+    {
+      "name": "reportingOptions",
+      "displayName": "ms-resource:loc.group.displayName.reportingOptions",
+      "isExpanded": false
+    },
+    {
+      "name": "advancedExecutionOptions",
+      "displayName": "ms-resource:loc.group.displayName.advancedExecutionOptions",
+      "isExpanded": false
+    }
+  ],
+  "inputs": [
+    {
+      "name": "sourcesDirectory",
+      "type": "filePath",
+      "label": "ms-resource:loc.input.label.sourcesDirectory",
+      "defaultValue": "$(build.sourcesDirectory)",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.sourcesDirectory"
+    },
+    {
+      "name": "testAssembly",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testAssembly",
+      "defaultValue": "**\\*test*.dll;-:**\\obj\\**",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.testAssembly",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "testFiltercriteria",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testFiltercriteria",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.testFiltercriteria",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "openCoverFilters",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.openCoverFilters",
+      "defaultValue": "+[*]*",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.openCoverFilters",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "disableCodeCoverage",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.disableCodeCoverage",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.disableCodeCoverage",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "vsTestCommand",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.vsTestCommand",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.vsTestCommand",
+      "groupName": "advancedExecutionOptions"
+    },
+    {
+      "name": "testAdapterPath",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testAdapterPath",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.testAdapterPath",
+      "groupName": "advancedExecutionOptions"
+    },
+    {
+      "name": "testAdditionalCommandLine",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testAdditionalCommandLine",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.testAdditionalCommandLine",
+      "groupName": "advancedExecutionOptions"
+    },
+    {
+      "name": "openCoverAdditionalCommandLine",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.openCoverAdditionalCommandLine",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.openCoverAdditionalCommandLine",
+      "groupName": "advancedExecutionOptions"
+    },
+    {
+      "name": "testRunTitle",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testRunTitle",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.testRunTitle",
+      "groupName": "reportingOptions"
+    },
+    {
+      "name": "platform",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.platform",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.platform",
+      "groupName": "reportingOptions"
+    },
+    {
+      "name": "configuration",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.configuration",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.configuration",
+      "groupName": "reportingOptions"
+    },
+    {
+      "name": "publishRunAttachments",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.publishRunAttachments",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.publishRunAttachments",
+      "groupName": "reportingOptions"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "RunOpenCoverTask.ps1"
+    }
+  }
+}
