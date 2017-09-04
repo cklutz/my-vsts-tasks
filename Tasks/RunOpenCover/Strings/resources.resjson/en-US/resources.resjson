@@ -1,6 +1,6 @@
 {
   "loc.friendlyName": "Run OpenCover",
-  "loc.helpMarkDown": "Replace with markdown to show in help",
+  "loc.helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks)",
   "loc.description": "Runs VSTest under OpenCover",
   "loc.instanceNameFormat": "Tests/Coverage - $(testAssembly)",
   "loc.group.displayName.executionOptions": "Execution Options",
@@ -14,8 +14,8 @@
   "loc.input.help.testFiltercriteria": "Additional criteria to filter tests from Test assemblies. For example: Priority=1|Name=MyTestMethod",
   "loc.input.label.openCoverFilters": "OpenCover Filter criteria",
   "loc.input.help.openCoverFilters": "Additional criteria to filter what OpenCover considers.",
-  "loc.input.label.disableCodeCoverage": "OpenCover Filter criteria",
-  "loc.input.help.disableCodeCoverage": "Additional criteria to filter what OpenCover considers.",
+  "loc.input.label.disableCodeCoverage": "Disable OpenCover",
+  "loc.input.help.disableCodeCoverage": "Disable OpenCover. Run tests without coverage.",
   "loc.input.label.vsTestCommand": "Path to vstest.console.exe",
   "loc.input.help.vsTestCommand": "Optionally supply the path to VSTest.",
   "loc.input.label.testAdapterPath": "Path to Custom Test Adapters",

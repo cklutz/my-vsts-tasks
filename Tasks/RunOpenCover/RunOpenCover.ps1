@@ -17,16 +17,20 @@ Param(
     [string]$openCoverAdditionalCommandLine,
     [string]$openCoverFilters="+[*]*",
     [string]$vsTestCommand,
-    [switch]$publishRunAttachments
+    [switch]$publishRunAttachments,
+    [switch]$taskMode
 )
-$ErrorActionPreference = 'Stop'
-
-if (-Not (Get-Command Invoke-VstsTool -ErrorAction SilentlyContinue)) {
-    Import-Module "$PSScriptRoot\ps_modules\VstsTaskSdk"
-}
 
 Trace-VstsEnteringInvocation $MyInvocation
 Set-StrictMode -Version 3.0
+
+$ErrorActionPreference = 'Stop'
+
+Write-Host "Running task: $taskMode"
+
+if (!$taskMode) {
+    Import-Module "$PSScriptRoot\ps_modules\VstsTaskSdk"
+}
 
 function SendCommand($commandName, $properties, $data) {
     $command = '##vso['
@@ -36,16 +40,14 @@ function SendCommand($commandName, $properties, $data) {
     if ($properties -and $properties.Count -gt 0) {
         foreach ($key in $properties.Keys.GetEnumerator()) {
             $val = $properties[$key]
-            if ($val -and $val.Length -gt 0) {
-                if ($first) {
-                    $command += ' '
-                    $first = $false
-                }
-                $command += $key
-                $command += '='
-                $command += $val
-                $command += ';'
+            if ($first) {
+                $command += ' '
+                $first = $false
             }
+            $command += $key
+            $command += '='
+            $command += $val
+            $command += ';'
         }
     }
 
@@ -58,9 +60,10 @@ function SendCommand($commandName, $properties, $data) {
 }
 
 function FindCommand ($directory, $commandName) {
+    Write-Host "Checking for '$commandName' in '$directory' tree"
     $results = Get-ChildItem -Path $directory -Filter $commandName -Recurse -ErrorAction SilentlyContinue -Force
-    if ($results.Length -eq 0) {
-        throw "Command '$commandName' not found in directory tree '$directory'."
+    if (!$results -or $results.Length -eq 0) {
+        throw "Command '$commandName' not found in directory tree '$directory' (source directory)."
     }
     Write-Host "Using $($results[0].FullName)"
     return $results[0].FullName
@@ -121,6 +124,9 @@ try {
     # Create tempDir underneath sources so that any publish-artificats task
     # don't pick stuff up accidentally.
     $tempDir = $sourcesDirectory + "\CoverageResults"
+    if ($runTitle) {
+        $tempDir += '\' + $runTitle
+    }
     if (Test-Path $tempDir) {
         Remove-Item -Path $tempDir -Recurse -Force
     }
@@ -184,6 +190,7 @@ try {
         config = $configuration;
         publishRunAttachments = $publishRunAttachments
     }
+
     SendCommand 'results.publish' $testResultParameters ''
             
     if (!$disableCodeCoverage) {
@@ -194,6 +201,7 @@ try {
             reportdirectory = $reportDirectory
             additionalcodecoveragefiles = $openCoverReport
         }
+
         SendCommand 'codecoverage.publish' $codeCoverageParameters ''
     }
 } finally {
