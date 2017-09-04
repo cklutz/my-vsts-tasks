@@ -31,6 +31,20 @@
                         ],
                         "dest": "tools/OpenCover/",
                         "options": "-R"
+                    },
+                    {
+                        "source": [
+                            "tools/x86/*.*"
+                        ],
+                        "dest": "tools/OpenCover/x86",
+                        "options": "-R"
+                    },
+                    {
+                        "source": [
+                            "tools/x64/*.*"
+                        ],
+                        "dest": "tools/OpenCover/x64",
+                        "options": "-R"
                     }
                 ]
             },
