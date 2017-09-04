@@ -19,6 +19,48 @@
                         "options": "-R"
                     }
                 ]
+            },
+            {
+                "name": "OpenCover",
+                "version": "4.6.519",
+                "repository": "https://www.nuget.org/api/v2/",
+                "cp": [
+                    {
+                        "source": [
+                            "tools/*.*"
+                        ],
+                        "dest": "tools/OpenCover/",
+                        "options": "-R"
+                    }
+                ]
+            },
+            {
+                "name": "ReportGenerator",
+                "version": "2.4.4.0",
+                "repository": "https://www.nuget.org/api/v2/",
+                "cp": [
+                    {
+                        "source": [
+                            "tools/*.*"
+                        ],
+                        "dest": "tools/ReportGenerator/",
+                        "options": "-R"
+                    }
+                ]
+            },
+            {
+                "name": "OpenCoverToCoberturaConverter",
+                "version": "0.2.6.0",
+                "repository": "https://www.nuget.org/api/v2/",
+                "cp": [
+                    {
+                        "source": [
+                            "tools/*.*"
+                        ],
+                        "dest": "tools/OpenCoverToCoberturaConverter/",
+                        "options": "-R"
+                    }
+                ]
             }
         ]
     }

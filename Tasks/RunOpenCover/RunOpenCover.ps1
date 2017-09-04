@@ -18,7 +18,8 @@ Param(
     [string]$openCoverFilters="+[*]*",
     [string]$vsTestCommand,
     [switch]$publishRunAttachments,
-    [switch]$taskMode
+    [switch]$taskMode,
+    [switch]$toolsInSourcesDirectory
 )
 
 Trace-VstsEnteringInvocation $MyInvocation
@@ -78,9 +79,16 @@ try {
         }
     }
 
-    $openCoverConsoleExe = FindCommand $sourcesDirectory "OpenCover.Console.exe"
-    $coberturaConverterExe = FindCommand $sourcesDirectory "OpenCoverToCoberturaConverter.exe"
-    $reportGeneratorExe = FindCommand $sourcesDirectory "ReportGenerator.exe"
+    if ($toolsInSourcesDirectory) {
+        $openCoverConsoleExe = FindCommand $sourcesDirectory "OpenCover.Console.exe"
+        $coberturaConverterExe = FindCommand $sourcesDirectory "OpenCoverToCoberturaConverter.exe"
+        $reportGeneratorExe = FindCommand $sourcesDirectory "ReportGenerator.exe"
+    } else {
+        Write-Host "Using packaged tools."
+        $openCoverConsoleExe = "$PSScriptRoot\tools\OpenCover\OpenCover.Console.exe"
+        $coberturaConverterExe = "$PSScriptRoot\tools\OpenCoverToCoberturaConverter\OpenCoverToCoberturaConverter.exe"
+        $reportGeneratorExe = "$PSScriptRoot\tools\ReportGenerator\ReportGenerator.exe"
+    }
 
     if ($vsTestCommand) {
         $vsconsoleExe = $vsTestCommand

@@ -10,6 +10,7 @@ var ncp = require('child_process');
 var semver = require('semver');
 var shell = require('shelljs');
 var syncRequest = require('sync-request');
+var childproc = require('child_process');
 
 // global paths
 var downloadPath = path.join(__dirname, '_download');
@@ -302,8 +303,27 @@ var downloadFile = function (url) {
 
         // download the file
         mkdir('-p', path.join(downloadPath, 'file'));
-        var result = syncRequest('GET', url);
-        fs.writeFileSync(targetPath, result.getBody());
+
+        if (process.env.http_proxy) {
+            $command = 'curl.exe -k -L --proxy "' + process.env.http_proxy + '"';
+            if (process.env.http_proxyuser) {
+                if (process.env.http_proxypass) {
+                    $command += ' --proxyuser "' + process.env.http_proxyuser + ':' + process.env.http_proxypass + '"';
+                } else {
+                    $command += ' --proxyuser "' + process.env.http_proxyuser + '"';
+                }
+            } else {
+                $command += ' --proxy-ntlm';
+            }
+            $command += ' -o "' + targetPath + '"';
+            $command += ' "' + url + '"';
+
+            console.log('Executing: ' + $command);
+            childproc.execSync($command);
+        } else {
+            var result = syncRequest('GET', url);
+            fs.writeFileSync(targetPath, result.getBody());
+        }
 
         // write the completed marker
         fs.writeFileSync(marker, '');
@@ -516,6 +536,26 @@ var getExternals = function (externals, destRoot) {
     // external NuGet V2 packages
     if (externals.hasOwnProperty('nugetv2')) {
         var nugetPackages = externals.nugetv2;
+        nugetPackages.forEach(function (package) {
+            // validate the structure of the data
+            assert(package.name, 'package.name');
+            assert(package.version, 'package.version');
+            assert(package.repository, 'package.repository');
+            assert(package.cp, 'package.cp');
+            assert(package.cp, 'package.cp.length');
+
+            // download and extract the NuGet V2 package
+            var url = package.repository.replace(/\/$/, '') + '/package/' + package.name + '/' + package.version;
+            var packageSource = downloadArchive(url, /*omitExtensionCheck*/true);
+
+            // copy specific files
+            copyGroups(package.cp, packageSource, destRoot);
+        });
+    }
+
+    // external NuGet V3 packages
+    if (externals.hasOwnProperty('nugetv3')) {
+        var nugetPackages = externals.nugetv3;
         nugetPackages.forEach(function (package) {
             // validate the structure of the data
             assert(package.name, 'package.name');
