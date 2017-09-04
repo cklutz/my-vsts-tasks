@@ -79,10 +79,10 @@
     {
       "name": "disableCodeCoverage",
       "type": "boolean",
-      "label": "OpenCover Filter criteria",
+      "label": "Disable OpenCover",
       "defaultValue": "false",
       "required": false,
-      "helpMarkDown": "Additional criteria to filter what OpenCover considers.",
+      "helpMarkDown": "Disable OpenCover. Run tests without coverage.",
       "groupName": "executionOptions"
     },
 

@@ -327,6 +327,10 @@ var downloadArchive = function (url, omitExtensionCheck) {
     var scrubbedUrl = url.replace(/[/\:?]/g, '_');
     var targetPath = path.join(downloadPath, 'archive', scrubbedUrl);
     var marker = targetPath + '.completed';
+    console.log('Marker file: ' + marker);
+    console.log('Downloaded archive: ' + url);
+    console.log('Target path extracted archive: ' + targetPath);
+    
     if (!test('-f', marker)) {
         // download the archive
         var archivePath = downloadFile(url);
