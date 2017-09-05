@@ -13,7 +13,7 @@ It uses the following tools:
 Coverage results are visible in the "Code Coverage" section of a TFS Build summary and detailed information is
 added as an attachment for closer inspection.
 
-[!summary_view](..\..\docs\images\opencover_summary_view.png)
+![summary_view](../../docs/images/opencover_summary_view.png)
 
 This task builds upon the VSTest task, which is MIT licensed and available as source [here](https://github.com/Microsoft/vsts-tasks/tree/release/m109/Tasks/VsTest).
 
