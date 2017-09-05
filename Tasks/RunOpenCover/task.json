@@ -18,8 +18,8 @@
   ],
   "version": {
     "Major": "0",
-    "Minor": "3",
-    "Patch": "2"
+    "Minor": "4",
+    "Patch": "0"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Tests/Coverage - $(testAssembly)",
@@ -55,7 +55,7 @@
       "label": "Test Assembly",
       "defaultValue": "**\\*test*.dll;-:**\\obj\\**",
       "required": true,
-      "helpMarkDown": "Test binaries to run tests on. Wildcards can be used.  For example, `**\\*test*.dll;-:**\\obj\\**` for all dlls with test in name while excluding files in any sub-directory named obj.",
+      "helpMarkDown": "Test binaries to run tests on. Wildcards can be used. For example, `**\\*test*.dll;-:**\\obj\\**` for all dlls with test in name while excluding files in any sub-directory named obj.",
       "groupName": "executionOptions"
     },
     {
@@ -65,6 +65,15 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "Additional criteria to filter tests from Test assemblies. For example: Priority=1|Name=MyTestMethod",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "runSettingsFile",
+      "type": "filePath",
+      "label": "Run Settings File",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Path to runsettings file to use with the tests. Use `$(Build.SourcesDirectory)` to access the Project folder.",
       "groupName": "executionOptions"
     },
     {
@@ -101,7 +110,7 @@
       "label": "Path to Custom Test Adapters",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Directory path to custom test adapters.",
+      "helpMarkDown": "Directory path to custom test adapters. For example, `$(build.SourcesDirectory)\\packages`.",
       "groupName":"advancedExecutionOptions"
     },
     {
@@ -110,7 +119,7 @@
       "label": "Additional VSTest Options",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Other Console options that can be passed to vstest.console.exe.",
+      "helpMarkDown": "Other Console options that can be passed to vstest.console.exe. See [MSDN](https://msdn.microsoft.com/en-us/library/jj155796.aspx) for more information.",
       "groupName":"advancedExecutionOptions"
     },
     {
@@ -119,8 +128,31 @@
       "label": "Additional OpenCover Options",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Other Console options that can be passed to opencover.console.exe.",
+      "helpMarkDown": "Other Console options that can be passed to opencover.console.exe. E.g. `-skipautoprops`, see [OpenCover Usage](https://github.com/opencover/opencover/wiki/Usage) for more information.",
       "groupName":"advancedExecutionOptions"
+    },
+
+    {
+      "name": "toolsLocationMethod",
+      "type": "radio",
+      "label": "OpenCover Tools",
+      "required": false,
+      "groupName": "advancedExecutionOptions",
+      "defaultValue": "packaged",
+      "options": {
+          "packaged": "Use packaged tools",
+          "location": "Specify Location"
+      }
+    },
+    {
+      "name": "toolsBaseDirectory",
+      "type": "string",
+      "label": "Path where tools are located",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "The base directory where OpenCover tools are located (e.g. `$(build.sourcesDirectory)\\packages`).",
+      "visibleRule": "toolsLocationMethod = location",
+      "groupName": "advancedExecutionOptions"
     },
 
     {

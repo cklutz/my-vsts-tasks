@@ -19,7 +19,8 @@ Param(
     [string]$vsTestCommand,
     [switch]$publishRunAttachments,
     [switch]$taskMode,
-    [switch]$toolsInSourcesDirectory
+    [string]$toolsBaseDirectory,
+    [string]$runSettingsFile
 )
 
 Trace-VstsEnteringInvocation $MyInvocation
@@ -79,10 +80,10 @@ try {
         }
     }
 
-    if ($toolsInSourcesDirectory) {
-        $openCoverConsoleExe = FindCommand $sourcesDirectory "OpenCover.Console.exe"
-        $coberturaConverterExe = FindCommand $sourcesDirectory "OpenCoverToCoberturaConverter.exe"
-        $reportGeneratorExe = FindCommand $sourcesDirectory "ReportGenerator.exe"
+    if ($toolsBaseDirectory) {
+        $openCoverConsoleExe = FindCommand $toolsBaseDirectory "OpenCover.Console.exe"
+        $coberturaConverterExe = FindCommand $toolsBaseDirectory "OpenCoverToCoberturaConverter.exe"
+        $reportGeneratorExe = FindCommand $toolsBaseDirectory "ReportGenerator.exe"
     } else {
         Write-Host "Using packaged tools."
         $openCoverConsoleExe = "$PSScriptRoot\tools\OpenCover\OpenCover.Console.exe"
@@ -143,6 +144,7 @@ try {
     $vsconsoleArgs = $testFilesString
     if ($testAdapterPath) { $vsconsoleArgs += " /TestAdapterPath:""$testAdapterPath""" }
     if ($testFilterCriteria) { $vsconsoleArgs += " /TestCaseFilter:""$testFiltercriteria""" }
+    if ($runSettingsFile) { $vsconsoleArgs += " /Settings:""$runSettingsFile""" }
     $vsconsoleArgs += " /logger:trx"
     if ($testAdditionalCommandLine) {
         $vsconsoleArgs += " "
@@ -156,14 +158,17 @@ try {
         $vsconsoleArgs = $vsconsoleArgs.Replace('"', '\"')
 
         $openCoverConsoleArgs = "-register:user"
-        $openCoverConsoleArgs += " -filter:""$OpenCoverFilters"""
+        if ($openCoverFilters) {
+            # Only append filters, if there actually is a value. This way,
+            # the caller could use a fully custom filter situation (e.g.
+            # with -coverbytest, etc.) using the $openCoverAdditionalCommandLine
+            # option.
+            $openCoverConsoleArgs += " -filter:""$openCoverFilters"""
+        }
         $openCoverConsoleArgs += " -target:""$vsconsoleExe"""
         $openCoverConsoleArgs += " -targetargs:""$vsconsoleArgs"""
         $openCoverConsoleArgs += " -output:""$tempDir\OpenCover.xml"""
         $openCoverConsoleArgs += " -mergebyhash"
-        $openCoverConsoleArgs += " -threshold:1"
-        $openCoverConsoleArgs += " -skipautoprops"
-        $openCoverConsoleArgs += " -hideskipped:All"
         $openCoverConsoleArgs += " -returntargetcode"
         if ($openCoverAdditionalCommandLine) {
             $openCoverConsoleArgs += " "
@@ -189,7 +194,7 @@ try {
     }
 
     # Publish test results.
-    $resultFiles = Find-VstsFiles -LegacyPattern "**\*.trx" -LiteralDirectory $sourcesDirectory
+    $resultFiles = Find-VstsFiles -LegacyPattern "**\*.trx" -LiteralDirectory "$tempDir\TestResults"
     $testResultParameters = [ordered]@{
         type = 'VSTest';
         resultFiles = $resultFiles;

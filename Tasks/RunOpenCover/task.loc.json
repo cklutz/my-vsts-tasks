@@ -18,8 +18,8 @@
   ],
   "version": {
     "Major": "0",
-    "Minor": "3",
-    "Patch": "2"
+    "Minor": "4",
+    "Patch": "0"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
@@ -119,6 +119,28 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "ms-resource:loc.input.help.openCoverAdditionalCommandLine",
+      "groupName": "advancedExecutionOptions"
+    },
+    {
+      "name": "toolsLocationMethod",
+      "type": "radio",
+      "label": "ms-resource:loc.input.label.toolsLocationMethod",
+      "required": false,
+      "groupName": "advancedExecutionOptions",
+      "defaultValue": "packaged",
+      "options": {
+        "packaged": "Use packaged tools",
+        "location": "Specify Location"
+      }
+    },
+    {
+      "name": "toolsBaseDirectory",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.toolsBaseDirectory",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.toolsBaseDirectory",
+      "visibleRule": "toolsLocationMethod = location",
       "groupName": "advancedExecutionOptions"
     },
     {

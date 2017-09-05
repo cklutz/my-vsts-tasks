@@ -21,3 +21,28 @@ Build a single task:
 
      node make.js build --task RunOpenCover
      node make.js test --task RunOpenCover
+
+## Deploy a Build Task
+
+### One time preparation
+
+Use the [tfx-cli](https://github.com/Microsoft/tfs-cli) tool to upload and generally
+manage build tasks for VSTS or an on premise TFS instance.
+
+Install the tfx tool by `npm install -g tfx-cli`.
+
+Afterwards make sure you login to your TFS / VSTS instance of choice, for example:
+
+     tfx logon -u http://localhost:8080/tfs/MyCollection --token <token>
+
+(You can create a token from your "Security" settings in TFS/VSTS). I recommend setting
+the `TFX_TRACE` environment variable to `1` for all your work, because otherwise the
+tfx utility is a little to quiet, especially and even when errors occur (e.g. a login
+fails).
+
+### Deployment
+
+     tfx build tasks upload --task-path .\_build\Tasks\RunOpenCoverTask
+
+Make sure to update at least the patch version in your `task.json` everytime you
+redeploy a new version.
