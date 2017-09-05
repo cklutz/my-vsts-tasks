@@ -1,6 +1,6 @@
 {
   "loc.friendlyName": "Run OpenCover",
-  "loc.helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks)",
+  "loc.helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks/Tasks/RunOpenCover/README.md)",
   "loc.description": "Runs VSTest under OpenCover",
   "loc.instanceNameFormat": "Tests/Coverage - $(testAssembly)",
   "loc.group.displayName.executionOptions": "Execution Options",

@@ -19,7 +19,7 @@
   "version": {
     "Major": "1",
     "Minor": "0",
-    "Patch": "0"
+    "Patch": "3"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
@@ -55,8 +55,7 @@
       "label": "ms-resource:loc.input.label.testAssembly",
       "defaultValue": "**\\*test*.dll;-:**\\obj\\**",
       "required": true,
-      "helpMarkDown": "ms-resource:loc.input.help.testAssembly",
-      "groupName": "executionOptions"
+      "helpMarkDown": "ms-resource:loc.input.help.testAssembly"
     },
     {
       "name": "testFiltercriteria",

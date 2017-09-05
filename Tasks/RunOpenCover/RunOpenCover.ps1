@@ -134,13 +134,25 @@ try {
     # Create tempDir underneath sources so that any publish-artificats task
     # don't pick stuff up accidentally.
     $tempDir = $sourcesDirectory + "\CoverageResults"
-    if ($runTitle) {
-        $tempDir += '\' + $runTitle
+    # if ($runTitle) {
+    #     $tempDir += '\' + $runTitle
+    # }
+    # if (Test-Path $tempDir) {
+    #     Remove-Item -Path $tempDir -Recurse -Force
+    # }
+
+    if (-Not (Test-Path $tempDir)) {
+        New-Item -Path $tempDir -ItemType Directory | Out-Null
     }
-    if (Test-Path $tempDir) {
-        Remove-Item -Path $tempDir -Recurse -Force
+    $runId = $runTitle
+    if (!$runId) {
+        $runId = [Guid]::NewGuid().ToString("N")
     }
-    New-Item -Path $tempDir -ItemType Directory | Out-Null
+    $trxDir = "$tempDir\$runId"
+    if (Test-path $trxDir) {
+        Remove-Item -Recurse -Path $trxDir | Out-Null
+    }
+    New-Item -Path $trxDir -ItemType Directory | Out-Null
     
     $vsconsoleArgs = $testFilesString
     if ($testAdapterPath) { $vsconsoleArgs += " /TestAdapterPath:""$testAdapterPath""" }
@@ -168,6 +180,7 @@ try {
         }
         $openCoverConsoleArgs += " -target:""$vsconsoleExe"""
         $openCoverConsoleArgs += " -targetargs:""$vsconsoleArgs"""
+        $openCoverConsoleArgs += " -mergeoutput"
         $openCoverConsoleArgs += " -output:""$tempDir\OpenCover.xml"""
         $openCoverConsoleArgs += " -mergebyhash"
         $openCoverConsoleArgs += " -returntargetcode"
@@ -187,7 +200,7 @@ try {
         $reportGeneratorArgs = "-reports:""$openCoverReport"""
         $reportGeneratorArgs += " -targetdir:""$reportDirectory"""
         
-        Invoke-VstsTool -FileName $openCoverConsoleExe -Arguments $openCoverConsoleArgs -WorkingDirectory $tempDir -RequireExitCodeZero
+        Invoke-VstsTool -FileName $openCoverConsoleExe -Arguments $openCoverConsoleArgs -WorkingDirectory $trxDir -RequireExitCodeZero
         Invoke-VstsTool -FileName $coberturaConverterExe -Arguments $coberturaConverterArgs -RequireExitCodeZero
         Invoke-VstsTool -FileName $reportGeneratorExe -Arguments $reportGeneratorArgs -RequireExitCodeZero
     } else {
@@ -195,7 +208,7 @@ try {
     }
 
     # Publish test results.
-    $resultFiles = Find-VstsFiles -LegacyPattern "**\*.trx" -LiteralDirectory "$tempDir\TestResults"
+    $resultFiles = Find-VstsFiles -LegacyPattern "**\*.trx" -LiteralDirectory $trxDir
     $testResultParameters = [ordered]@{
         type = 'VSTest';
         resultFiles = $resultFiles;
