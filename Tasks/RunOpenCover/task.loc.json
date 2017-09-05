@@ -17,8 +17,8 @@
     "vstest"
   ],
   "version": {
-    "Major": "0",
-    "Minor": "4",
+    "Major": "1",
+    "Minor": "0",
     "Patch": "0"
   },
   "minimumAgentVersion": "1.95.0",
@@ -68,6 +68,15 @@
       "groupName": "executionOptions"
     },
     {
+      "name": "runSettingsFile",
+      "type": "filePath",
+      "label": "ms-resource:loc.input.label.runSettingsFile",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.runSettingsFile",
+      "groupName": "executionOptions"
+    },
+    {
       "name": "openCoverFilters",
       "type": "string",
       "label": "ms-resource:loc.input.label.openCoverFilters",
@@ -86,12 +95,40 @@
       "groupName": "executionOptions"
     },
     {
-      "name": "vsTestCommand",
+      "name": "vstestLocationMethod",
+      "type": "radio",
+      "label": "ms-resource:loc.input.label.vstestLocationMethod",
+      "required": false,
+      "groupName": "advancedExecutionOptions",
+      "defaultValue": "version",
+      "options": {
+        "version": "Version",
+        "location": "Specific location"
+      }
+    },
+    {
+      "name": "vsTestVersion",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.vsTestVersion",
+      "defaultValue": "latest",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.vsTestVersion",
+      "visibleRule": "vstestLocationMethod = version",
+      "groupName": "advancedExecutionOptions",
+      "options": {
+        "latest": "Latest",
+        "15.x": "Visual Studio 2017",
+        "14.0": "Visual Studio 2015"
+      }
+    },
+    {
+      "name": "vstestLocation",
       "type": "string",
-      "label": "ms-resource:loc.input.label.vsTestCommand",
+      "label": "ms-resource:loc.input.label.vstestLocation",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "ms-resource:loc.input.help.vsTestCommand",
+      "helpMarkDown": "ms-resource:loc.input.help.vstestLocation",
+      "visibleRule": "vstestLocationMethod = location",
       "groupName": "advancedExecutionOptions"
     },
     {

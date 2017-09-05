@@ -4,7 +4,7 @@
   "friendlyName": "Run OpenCover",
   "description": "Runs VSTest under OpenCover",
   "author": "Christian Klutz",
-  "helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks)",
+  "helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks/Tasks/RunOpenCover/README.md)",
   "category": "Test",
   "visibility": [
     "Build"
@@ -17,8 +17,8 @@
     "vstest"
   ],
   "version": {
-    "Major": "0",
-    "Minor": "4",
+    "Major": "1",
+    "Minor": "0",
     "Patch": "0"
   },
   "minimumAgentVersion": "1.95.0",
@@ -55,8 +55,7 @@
       "label": "Test Assembly",
       "defaultValue": "**\\*test*.dll;-:**\\obj\\**",
       "required": true,
-      "helpMarkDown": "Test binaries to run tests on. Wildcards can be used. For example, `**\\*test*.dll;-:**\\obj\\**` for all dlls with test in name while excluding files in any sub-directory named obj.",
-      "groupName": "executionOptions"
+      "helpMarkDown": "Test binaries to run tests on. Wildcards can be used. For example, `**\\*test*.dll;-:**\\obj\\**` for all dlls with test in name while excluding files in any sub-directory named obj."
     },
     {
       "name": "testFiltercriteria",
@@ -96,14 +95,44 @@
     },
 
     {
-      "name": "vsTestCommand",
-      "type": "string",
-      "label": "Path to vstest.console.exe",
-      "defaultValue": "",
+      "name": "vstestLocationMethod",
+      "type": "radio",
+      "label": "Select test platform using",
       "required": false,
-      "helpMarkDown": "Optionally supply the path to VSTest.",
-      "groupName": "advancedExecutionOptions"
+      "groupName": "advancedExecutionOptions",
+      "defaultValue": "version",
+      "options": {
+          "version": "Version",
+          "location": "Specific location"
+      }
     },
+    {  
+        "name": "vsTestVersion",
+        "type": "pickList",
+        "label": "Test platform version",
+        "defaultValue": "latest",
+        "required": false,
+        "helpMarkDown": "The version of Visual Studio test to use.",
+        "visibleRule": "vstestLocationMethod = version",
+        "groupName": "advancedExecutionOptions",
+        "options": {
+            "latest": "Latest",
+            "15.x": "Visual Studio 2017",
+            "14.0": "Visual Studio 2015"
+        }
+    },
+    {
+        "name": "vstestLocation",
+        "type": "string",
+        "label": "Path to vstest.console.exe",
+        "defaultValue": "",
+        "required": false,
+        "helpMarkDown": "Optionally supply the path to VSTest.",
+        "visibleRule": "vstestLocationMethod = location",
+        "groupName": "advancedExecutionOptions"
+    },
+
+    
     {
       "name": "testAdapterPath",
       "type": "string",
@@ -183,13 +212,13 @@
       "groupName": "reportingOptions"
     },
     {
-        "name": "publishRunAttachments",
-        "type": "boolean",
-        "label": "Upload Test Attachments",
-        "defaultValue": "true",
-        "required": false,
-        "helpMarkDown": "Opt in/out of publishing test run level attachments.",
-        "groupName": "reportingOptions"
+      "name": "publishRunAttachments",
+      "type": "boolean",
+      "label": "Upload Test Attachments",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Opt in/out of publishing test run level attachments.",
+      "groupName": "reportingOptions"
     }
   ],
   "execution": {

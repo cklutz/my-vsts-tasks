@@ -28,7 +28,7 @@ Set-StrictMode -Version 3.0
 
 $ErrorActionPreference = 'Stop'
 
-Write-Host "Running task: $taskMode"
+Write-Verbose "Running task: $taskMode"
 
 if (!$taskMode) {
     Import-Module "$PSScriptRoot\ps_modules\VstsTaskSdk"
@@ -96,20 +96,21 @@ try {
     } else {
         $vsconsoleExe = "$env:VS140COMNTOOLS\..\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
     }
+    Write-Host "Using VSTest: $vsconsoleExe"
 
     # resolve test assembly files (copied from VSTest.ps1)
     $testAssemblyFiles = @()
     # check for solution pattern
     if ($testAssembly.Contains("*") -Or $testAssembly.Contains("?"))
     {
-        Write-Host "Pattern found in solution parameter. Calling Find-Files."
-        Write-Host "Calling Find-Files with pattern: $testAssembly"    
+        Write-Verbose "Pattern found in solution parameter. Calling Find-Files."
+        Write-Verbose "Calling Find-Files with pattern: $testAssembly"    
         $testAssemblyFiles = Find-VstsFiles -LegacyPattern $testAssembly -LiteralDirectory $sourcesDirectory
-        Write-Host "Found files: $testAssemblyFiles"
+        Write-Verbose "Found files: $testAssemblyFiles"
     }
     else
     {
-        Write-Host "No Pattern found in solution parameter."
+        Write-Verbose "No Pattern found in solution parameter."
         $testAssembly = $testAssembly.Replace(';;', "`0") # Barrowed from Legacy File Handler
         foreach ($assembly in $testAssembly.Split(";"))
         {
