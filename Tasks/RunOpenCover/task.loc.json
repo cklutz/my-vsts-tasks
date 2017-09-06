@@ -11,10 +11,10 @@
   ],
   "runsOn": [
     "Agent",
-    "MachineGroup"
+    "DeploymentGroup"
   ],
   "demands": [
-    "vstest"
+    "VSTest"
   ],
   "version": {
     "Major": "1",
