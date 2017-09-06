@@ -17,9 +17,9 @@
     "VSTest"
   ],
   "version": {
-    "Major": "1",
-    "Minor": "0",
-    "Patch": "3"
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 8
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",

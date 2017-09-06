@@ -26,6 +26,7 @@ if ($Individually) {
             [System.IO.Compression.ZipFile]::CreateFromDirectory($sourceDir, "$targetDir\task.zip")
         }
 } else {
+    Write-Host $TargetPath
     # Create the target directory.
     $targetDir = [System.IO.Path]::GetDirectoryName($TargetPath)
     if (!(Test-Path -LiteralPath $targetDir -PathType Container)) {

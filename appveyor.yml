@@ -13,9 +13,26 @@ install:
 build_script:
   - npm run build
 
+after_build:
+  - node make.js package
+
 test_script:
   - npm test
 
+deploy:
+  release: chrisk-tasks-v$(appveyor_build_version)
+  description: 'Custom VSTS/TFS build tasks'
+  provider: GitHub
+  auth_token:
+    secure: JqHA68F4hpk9M0hqTsZjOKE5S12lGEZG8gRZTimIFQ/9L4vY+OAzC3Gs3rEjlPWx
+  artifact: _package/tasks.zip
+  draft: false
+  prerelease: false
+  on:
+    branch: master
+    appveyor_repo_tag: true
+
 cache:
   - node_modules -> package.json   
-  - _download -> **\make.json
+# Note: not caching _downloads; it seems downloading them fresh is faster than caching
+#  - _download -> **\make.json

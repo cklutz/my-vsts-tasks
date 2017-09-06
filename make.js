@@ -52,8 +52,6 @@ var buildPath = path.join(__dirname, '_build', 'Tasks');
 var buildTestsPath = path.join(__dirname, '_build', 'Tests');
 var commonPath = path.join(__dirname, '_build', 'Tasks', 'Common');
 var packagePath = path.join(__dirname, '_package');
-var legacyTestPath = path.join(__dirname, '_test', 'Tests-Legacy');
-var legacyTestTasksPath = path.join(__dirname, '_test', 'Tasks');
 
 // node min version
 var minNodeVer = '4.0.0';
@@ -265,232 +263,23 @@ target.test = function() {
     run('mocha ' + testsSpec.join(' '), /*inheritStreams:*/true);
 }
 
-//
-// node make.js testLegacy
-// node make.js testLegacy --suite L0/XCode
-//
-
-target.testLegacy = function() {
-    ensureTool('tsc', '--version', 'Version 1.8.7');
-    ensureTool('mocha', '--version', '2.3.3');
-
-    if (options.suite) {
-        fail('The "suite" parameter has been deprecated. Use the "task" parameter instead.');
-    }
-
-    // clean
-    console.log('removing _test');
-    rm('-Rf', path.join(__dirname, '_test'));
-
-    // copy the L0 source files for each task; copy the layout for each task
-    console.log();
-    console.log('> copying tasks');
-    taskList.forEach(function (taskName) {
-        var testCopySource = path.join(__dirname, 'Tests-Legacy', 'L0', taskName);
-        // copy the L0 source files if exist
-        if (test('-e', testCopySource)) {
-            console.log('copying ' + taskName);
-            var testCopyDest = path.join(legacyTestPath, 'L0', taskName);
-            matchCopy('*', testCopySource, testCopyDest, { noRecurse: true, matchBase: true });
-
-            // copy the task layout
-            var taskJsonPath = path.join(__dirname, 'Tasks', taskName, 'task.json');
-            var taskJson = JSON.parse(fs.readFileSync(taskJsonPath).toString());
-            var taskCopySource = path.join(buildPath, taskJson.name);
-            var taskCopyDest = path.join(legacyTestTasksPath, taskJson.name);
-            matchCopy('*', taskCopySource, taskCopyDest, { noRecurse: true, matchBase: true });
-        }
-
-        // copy each common-module L0 source files if exist
-        var taskMakePath = path.join(__dirname, 'Tasks', taskName, 'make.json');
-        var taskMake = test('-f', taskMakePath) ? JSON.parse(fs.readFileSync(taskMakePath).toString()) : {};
-        if (taskMake.hasOwnProperty('common')) {
-            var common = taskMake['common'];
-            common.forEach(function(mod) {
-                // copy the common-module L0 source files if exist and not already copied
-                var modName = path.basename(mod['module']);
-                console.log('copying ' + modName);
-                var modTestCopySource = path.join(__dirname, 'Tests-Legacy', 'L0', `Common-${modName}`);
-                var modTestCopyDest = path.join(legacyTestPath, 'L0', `Common-${modName}`);
-                if (test('-e', modTestCopySource) && !test('-e', modTestCopyDest)) {
-                    matchCopy('*', modTestCopySource, modTestCopyDest, { noRecurse: true, matchBase: true });
-                }
-                var modCopySource = path.join(commonPath, modName);
-                var modCopyDest = path.join(legacyTestTasksPath, 'Common', modName);
-                if (test('-e', modCopySource) && !test('-e', modCopyDest)) {
-                    // copy the common module layout
-                    matchCopy('*', modCopySource, modCopyDest, { noRecurse: true, matchBase: true });
-                }
-            });
-        }
-    });
-
-    // short-circuit if no tests
-    if (!test('-e', legacyTestPath)) {
-        banner('no legacy tests found', true);
-        return;
-    }
-
-    // copy the legacy test infra
-    console.log();
-    console.log('> copying legacy test infra');
-    matchCopy('@(definitions|lib|tsconfig.json)', path.join(__dirname, 'Tests-Legacy'), legacyTestPath, { noRecurse: true, matchBase: true });
-
-    // copy the lib tests when running all legacy tests
-    if (!options.task) {
-        matchCopy('*', path.join(__dirname, 'Tests-Legacy', 'L0', 'lib'), path.join(legacyTestPath, 'L0', 'lib'), { noRecurse: true, matchBase: true });
-    }
-
-    // compile legacy L0 and lib
-    var testSource = path.join(__dirname, 'Tests-Legacy');
-    cd(legacyTestPath);
-    run('tsc --rootDir ' + legacyTestPath);
-
-    // create a test temp dir - used by the task runner to copy each task to an isolated dir
-    var tempDir = path.join(legacyTestPath, 'Temp');
-    process.env['TASK_TEST_TEMP'] = tempDir;
-    mkdir('-p', tempDir);
-
-    // suite paths
-    var testsSpec = matchFind(path.join('**', '_suite.js'), path.join(legacyTestPath, 'L0'));
-    if (!testsSpec.length) {
-        fail(`Unable to find tests using the pattern: ${path.join('**', '_suite.js')}`);
-    }
-
-    // mocha doesn't always return a non-zero exit code on test failure. when only
-    // a single suite fails during a run that contains multiple suites, mocha does
-    // not appear to always return non-zero. as a workaround, the following code
-    // creates a wrapper suite with an "after" hook. in the after hook, the state
-    // of the runnable context is analyzed to determine whether any tests failed.
-    // if any tests failed, log a ##vso command to fail the build.
-    var testsSpecPath = ''
-    var testsSpecPath = path.join(legacyTestPath, 'testsSpec.js');
-    var contents = 'var __suite_to_run;' + os.EOL;
-    contents += 'describe(\'Legacy L0\', function (__outer_done) {' + os.EOL;
-    contents += '    after(function (done) {' + os.EOL;
-    contents += '        var failedCount = 0;' + os.EOL;
-    contents += '        var suites = [ this._runnable.parent ];' + os.EOL;
-    contents += '        while (suites.length) {' + os.EOL;
-    contents += '            var s = suites.pop();' + os.EOL;
-    contents += '            suites = suites.concat(s.suites); // push nested suites' + os.EOL;
-    contents += '            failedCount += s.tests.filter(function (test) { return test.state != "passed" }).length;' + os.EOL;
-    contents += '        }' + os.EOL;
-    contents += '' + os.EOL;
-    contents += '        if (failedCount && process.env.TF_BUILD) {' + os.EOL;
-    contents += '            console.log("##vso[task.logissue type=error]" + failedCount + " test(s) failed");' + os.EOL;
-    contents += '            console.log("##vso[task.complete result=Failed]" + failedCount + " test(s) failed");' + os.EOL;
-    contents += '        }' + os.EOL;
-    contents += '' + os.EOL;
-    contents += '        done();' + os.EOL;
-    contents += '    });' + os.EOL;
-    testsSpec.forEach(function (itemPath) {
-        contents += `    __suite_to_run = require(${JSON.stringify(itemPath)});` + os.EOL;
-    });
-    contents += '});' + os.EOL;
-    fs.writeFileSync(testsSpecPath, contents);
-    run('mocha ' + testsSpecPath, /*inheritStreams:*/true);
-}
-
 target.package = function() {
     // clean
     rm('-Rf', packagePath);
 
-    // create the non-aggregated layout
-    util.createNonAggregatedZip(buildPath, packagePath);
+    util.compressTasks(buildPath, packagePath + '\\tasks.zip', false);
 
-    // if task specified, create hotfix layout and short-circuit
-    if (options.task) {
-        util.createHotfixLayout(packagePath, options.task);
-        return;
-    }
+    // // create the non-aggregated layout
+    // util.createNonAggregatedZip(buildPath, packagePath);
 
-    // create the aggregated tasks layout
-    util.createAggregatedZip(packagePath);
+    // // if task specified, create hotfix layout and short-circuit
+    // if (options.task) {
+    //     util.createHotfixLayout(packagePath, options.task);
+    //     return;
+    // }
 
-    // nuspec
-    var version = options.version;
-    if (!version) {
-        console.warn('Skipping nupkg creation. Supply version with --version.');
-        return;
-    }
-
-    if (!semver.valid(version)) {
-        fail('invalid semver version: ' + version);
-    }
-
-    var pkgName = 'Mseng.MS.TF.Build.Tasks';
-    console.log();
-    console.log('> Generating .nuspec file');
-    var contents = '<?xml version="1.0" encoding="utf-8"?>' + os.EOL;
-    contents += '<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">' + os.EOL;
-    contents += '   <metadata>' + os.EOL;
-    contents += '      <id>' + pkgName + '</id>' + os.EOL;
-    contents += '      <version>' + version + '</version>' + os.EOL;
-    contents += '      <authors>bigbldt</authors>' + os.EOL;
-    contents += '      <owners>bigbldt,Microsoft</owners>' + os.EOL;
-    contents += '      <requireLicenseAcceptance>false</requireLicenseAcceptance>' + os.EOL;
-    contents += '      <description>For VSS internal use only</description>' + os.EOL;
-    contents += '      <tags>VSSInternal</tags>' + os.EOL;
-    contents += '   </metadata>' + os.EOL;
-    contents += '</package>' + os.EOL;
-    var nuspecPath = path.join(packagePath, 'pack-source', pkgName + '.nuspec');
-    fs.writeFileSync(nuspecPath, contents);
-
-    // package
-    ensureTool('nuget.exe');
-    var nupkgPath = path.join(packagePath, 'pack-target', `${pkgName}.${version}.nupkg`);
-    mkdir('-p', path.dirname(nupkgPath));
-    run(`nuget.exe pack ${nuspecPath} -OutputDirectory ${path.dirname(nupkgPath)}`);
-}
-
-// used by CI that does official publish
-target.publish = function() {
-    var server = options.server;
-    assert(server, 'server');
-
-    // if task specified, skip
-    if (options.task) {
-        banner('Task parameter specified. Skipping publish.');
-        return;
-    }
-
-    // get the branch/commit info
-    var refs = util.getRefs();
-
-    // test whether to publish the non-aggregated tasks zip
-    // skip if not the tip of a release branch
-    var release = refs.head.release;
-    var commit = refs.head.commit;
-    if (!release ||
-        !refs.releases[release] ||
-        commit != refs.releases[release].commit) {
-
-        // warn not publishing the non-aggregated
-        console.log(`##vso[task.logissue type=warning]Skipping publish for non-aggregated tasks zip. HEAD is not the tip of a release branch.`);
-    }
-    else {
-        // store the non-aggregated tasks zip
-        var nonAggregatedZipPath = path.join(packagePath, 'non-aggregated-tasks.zip');
-        util.storeNonAggregatedZip(nonAggregatedZipPath, release, commit);
-    }
-
-    // resolve the nupkg path
-    var nupkgFile;
-    var nupkgDir = path.join(packagePath, 'pack-target');
-    if (!test('-d', nupkgDir)) {
-        fail('nupkg directory does not exist');
-    }
-
-    var fileNames = fs.readdirSync(nupkgDir);
-    if (fileNames.length != 1) {
-        fail('Expected exactly one file under ' + nupkgDir);
-    }
-
-    nupkgFile = path.join(nupkgDir, fileNames[0]);
-
-    // publish the package
-    ensureTool('nuget3.exe');
-    run(`nuget3.exe push ${nupkgFile} -Source ${server} -apikey Skyrise`);
+    // // create the aggregated tasks layout
+    // util.createAggregatedZip(packagePath);
 }
 
 // used to bump the patch version in task.json files
@@ -502,7 +291,12 @@ target.bump = function() {
             fail(`Error processing '${taskName}'. version.Patch should be a number.`);
         }
 
-        taskJson.version.Patch = taskJson.version.Patch + 1;
+        var oldVersion = taskJson.version.Major + '.' + taskJson.version.Minor + '.' + taskJson.version.Patch;
+        var newPatch = taskJson.version.Patch + 1;
+        var newVersion = taskJson.version.Major + '.' + taskJson.version.Minor + '.' + newPatch;
+        console.log(`Bumping patch of ${taskName} from ${oldVersion} to ${newVersion}.`);
+
+        taskJson.version.Patch = newPatch;
         fs.writeFileSync(taskJsonPath, JSON.stringify(taskJson, null, 4));
     });
 }
