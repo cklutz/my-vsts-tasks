@@ -11,9 +11,8 @@ install:
   - npm install
   - gulp
 
-build: off
-  #- node make.js build --task RunOpenCover
-
+build_script:
+  - npm run build
 
 cache:
   - node_modules -> package.json   
