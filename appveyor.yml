@@ -20,6 +20,10 @@ test_script:
   - npm test
 
 deploy:
+  # Having "tag" set to the original repo-tag is utterly important, or each
+  # build will create a new tag and spawn a new build in consequence - going
+  # on endlessly (see http://help.appveyor.com/discussions/problems/3362-deployment-to-github).
+  tag: $(appveyor_repo_tag_name)
   release: chrisk-tasks-v$(appveyor_build_version)
   description: 'Custom VSTS/TFS build tasks'
   provider: GitHub
