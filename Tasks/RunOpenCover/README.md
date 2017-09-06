@@ -38,6 +38,8 @@ Use the following options to select tests and control how the tests are run and 
 
 - **Run Settings File:** Path to a runsettings or testsettings file can be specified here. The path can be to a file in the repository or a path to file on disk. Use $(Build.SourcesDirectory) to access the root project folder. [Click here](https://msdn.microsoft.com/library/jj635153.aspx) for more information on these files.
 
+- **Run in Parallel:** If set, tests will run in parallel leveraging available cores of the machine. [Click here](https://aka.ms/paralleltestexecution) to learn more about how tests are run in parallel.
+
 - **OpenCover Filter Criteria:** Filter what should be considered by OpenCover for code coverage. For example, "-\*[\*Tests.\*]".
 
 - **Disable OpenCover:** This allows you to only run the tests and not run OpenCover. Thus, the tasks behaves similar to to stock VSTest task from TFS / VSTS.

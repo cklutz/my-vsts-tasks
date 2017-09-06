@@ -19,7 +19,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 11
+    "Patch": 15
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
@@ -73,6 +73,15 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "ms-resource:loc.input.help.runSettingsFile",
+      "groupName": "executionOptions"
+    },
+    {
+      "name": "runInParallel",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.runInParallel",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.runInParallel",
       "groupName": "executionOptions"
     },
     {

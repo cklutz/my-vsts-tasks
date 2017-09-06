@@ -25,6 +25,7 @@ try {
     $toolsLocationMethod = Get-VstsInput -Name toolsLocationMethod
     $toolsBaseDirectory = Get-VstsInput -Name toolsBaseDirectory
     $runSettingsFile = Get-VstsInput -Name runSettingsFile
+    $runInParallel = Get-VstsInput -Name runInParallel -AsBool
 
     Write-Verbose "SourcesDirectory: $sourcesDirectory"
     Write-Verbose "testAssembly: $testAssembly"
@@ -44,6 +45,7 @@ try {
     Write-Verbose "runSettingsFile: $runSettingsFile"
     Write-Verbose "toolsLocationMethod: $toolsLocationMethod"
     Write-Verbose "toolsBaseDirectory: $toolsBaseDirectory"
+    Write-Verbose "runInParallel: $runInParallel"
 
     if ($toolsLocationMethod -and $toolsLocationMethod -eq "location") {
         if (-Not (Test-Path $toolsBaseDirectory)) {
@@ -101,6 +103,9 @@ try {
         }
     }
 
+    $defaultCpuCount = "0"
+    $runSettingsFileWithParallel = [string](SetupRunSettingsFileForParallel $runInParallel $runSettingsFile $defaultCpuCount)
+
     . $PSScriptRoot\RunOpenCover.ps1 `
         -sourcesDirectory $sourcesDirectory `
         -testAssembly $testAssembly `
@@ -117,7 +122,7 @@ try {
         -publishRunAttachments:$publishRunAttachments `
         -taskMode `
         -toolsBaseDirectory $toolsBaseDirectory `
-        -runSettingsFile $runSettingsFile
+        -runSettingsFile $runSettingsFileWithParallel
 
 } catch {
 

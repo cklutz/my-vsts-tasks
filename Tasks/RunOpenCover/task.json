@@ -19,7 +19,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 11
+        "Patch": 15
     },
     "minimumAgentVersion": "1.95.0",
     "instanceNameFormat": "Tests/Coverage - $(testAssembly)",
@@ -73,6 +73,15 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Path to runsettings file to use with the tests. Use `$(Build.SourcesDirectory)` to access the Project folder.",
+            "groupName": "executionOptions"
+        },
+        {
+            "name": "runInParallel",
+            "type": "boolean",
+            "label": "Run In Parallel",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Enable parallel execution of your tests.",
             "groupName": "executionOptions"
         },
         {

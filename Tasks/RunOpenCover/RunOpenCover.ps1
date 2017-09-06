@@ -170,6 +170,10 @@ try {
         # we should escape them by a backslash.
         $vsconsoleArgs = $vsconsoleArgs.Replace('"', '\"')
 
+        $openCoverReport = "$tempDir\OpenCover.xml"
+        $coberturaReport = "$tempDir\Cobertura.xml"
+        $reportDirectory = "$tempDir\CoverageReport"
+
         $openCoverConsoleArgs = "-register:user"
         if ($openCoverFilters) {
             # Only append filters, if there actually is a value. This way,
@@ -181,17 +185,13 @@ try {
         $openCoverConsoleArgs += " -target:""$vsconsoleExe"""
         $openCoverConsoleArgs += " -targetargs:""$vsconsoleArgs"""
         $openCoverConsoleArgs += " -mergeoutput"
-        $openCoverConsoleArgs += " -output:""$tempDir\OpenCover.xml"""
+        $openCoverConsoleArgs += " -output:""$openCoverReport"""
         $openCoverConsoleArgs += " -mergebyhash"
         $openCoverConsoleArgs += " -returntargetcode"
         if ($openCoverAdditionalCommandLine) {
             $openCoverConsoleArgs += " "
             $openCoverConsoleArgs += $openCoverAdditionalCommandLine
         }
-
-        $openCoverReport = "$tempDir\OpenCover.xml"
-        $coberturaReport = "$tempDir\Cobertura.xml"
-        $reportDirectory = "$tempDir\CoverageReport"
 
         $coberturaConverterArgs = "-input:""$openCoverReport"""
         $coberturaConverterArgs += " -output:""$coberturaReport"""

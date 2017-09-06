@@ -14,6 +14,8 @@
   "loc.input.help.testFiltercriteria": "Additional criteria to filter tests from Test assemblies. For example: Priority=1|Name=MyTestMethod",
   "loc.input.label.runSettingsFile": "Run Settings File",
   "loc.input.help.runSettingsFile": "Path to runsettings file to use with the tests. Use `$(Build.SourcesDirectory)` to access the Project folder.",
+  "loc.input.label.runInParallel": "Run In Parallel (Experimental)",
+  "loc.input.help.runInParallel": "Enable parallel execution of your tests (Experimental).",
   "loc.input.label.openCoverFilters": "OpenCover Filter criteria",
   "loc.input.help.openCoverFilters": "Additional criteria to filter what OpenCover considers.",
   "loc.input.label.disableCodeCoverage": "Disable OpenCover",
