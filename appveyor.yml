@@ -9,6 +9,11 @@ environment:
 install:
   - ps: Install-Product node $env:nodejs_version
   - npm install
+  - gulp
 
 build: off
   #- node make.js build --task RunOpenCover
+
+
+cache:
+  - node_modules -> package.json   
