@@ -1,28 +1,9 @@
-phases:
+environment:
+  nodejs_version: "6"
 
-################################################################################
-- phase: buildAll_windows
-################################################################################
-  displayName: Build all tasks (Windows)
-  condition: and(succeeded(), eq(variables.os, 'Windows_NT'))
-  queue:
-    parallel: $[ variables.build_windows_parallel ]
-  steps:
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm install
 
-  # Clean
-  - checkout: self
-    clean: true
-
-  # Use node 6, npm 3
-  - task: NodeTool@0
-    displayName: Use node 6.10.3
-    inputs:
-      versionSpec: "6.10.3"
-
-  # npm install
-  - script: npm install
-    displayName: npm install
-
-  # Build
-  - script: node make.js build --task "RunOpenCover"
-    displayName: Build
+build:
+  - node make.js build --task RunOpenCover
