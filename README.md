@@ -6,11 +6,31 @@ Currently, there is only one task:
 
 * [_RunOpenCover_](Tasks/RunOpenCover/README.md).
 
+## Status
+
+|   | Build & Test |
+|---|:-----:|
+|![Win](docs/images/win_med.png) **Windows**|[![Build status](https://ci.appveyor.com/api/projects/status/ddr94r6onjfjro23?svg=true)](https://ci.appveyor.com/project/cklutz/my-vsts-tasks)|
+
 ## Build
+
+### Fast pass
+
+To build and test everything, simply use:
+
+     build-full.cmd
+
+You will find packaged tasks in `_packages\tasks.zip`, from where you can [deploy/upload](#deploy-from-a-package) them.
+
+### Manual steps
 
 Once, install dependencies:
 
      npm install
+
+To increment all task's patch level - required to allow upload of a new version to VSTS/TFS:
+
+     node make.js bump
 
 Build and test:
 
@@ -42,7 +62,20 @@ fails).
 
 ### Deployment
 
-     tfx build tasks upload --task-path .\_build\Tasks\RunOpenCoverTask
+#### Deploy a local build
+
+To deploy the result of a local build (e.g. from cloning this repo):
+
+     tfx build tasks upload --task.path .\_build\Tasks\RunOpenCoverTask
 
 Make sure to update at least the patch version in your `task.json` everytime you
-redeploy a new version.
+redeploy a new version (e.g. via `node make.js bump`).
+
+#### Deploy from a package
+
+To deploy the result of a release's `tasks.zip`:
+
+     7za x -o %TEMP%\tasks tasks.zip
+     tfx build tasks upload --task.path %TEMP%\tasks\RunOpenCoverTask
+
+
