@@ -34,6 +34,27 @@ if (!$taskMode) {
     Import-Module "$PSScriptRoot\ps_modules\VstsTaskSdk"
 }
 
+function IsDebugEnabled {
+    return ($env:system_debug -ieq 'true')
+}
+
+function GetDiagFileName($vstestCommand, $runId) {
+    if (IsDebugEnabled) {
+        $versionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($vstestCommand)
+        if ($versionInfo.ProductMajorPart -gt 15 -Or `
+            ($versionInfo.ProductMajorPart -eq 15 -And ($versionInfo.ProductMinorPart -gt 0 -or $versionInfo.ProductBuildPart -ge 25428)) ){
+                return [System.IO.Path]::GetTempFileName() + '-' + $runId + '-vstest.log'
+        }
+    }
+    return $null;
+}
+
+function UploadDiagFile($fileName) {
+    if ($fileName -And (Test-Path $fileName)) {
+        SendCommand 'task.uploadfile' $null $fileName
+    }
+}
+
 function SendCommand($commandName, $properties, $data) {
     $command = '##vso['
     $command += $commandName
@@ -62,12 +83,12 @@ function SendCommand($commandName, $properties, $data) {
 }
 
 function FindCommand ($directory, $commandName) {
-    Write-Host "Checking for '$commandName' in '$directory' tree"
+    Write-Verbose "Checking for '$commandName' in '$directory' tree"
     $results = Get-ChildItem -Path $directory -Filter $commandName -Recurse -ErrorAction SilentlyContinue -Force
     if (!$results -or $results.Length -eq 0) {
         throw "Command '$commandName' not found in directory tree '$directory' (source directory)."
     }
-    Write-Host "Using $($results[0].FullName)"
+    Write-Verbose "Using $($results[0].FullName)"
     return $results[0].FullName
 }
 
@@ -81,11 +102,12 @@ try {
     }
 
     if ($toolsBaseDirectory) {
+        Write-Verbose "Trying to find tools in $toolsBaseDirectory."
         $openCoverConsoleExe = FindCommand $toolsBaseDirectory "OpenCover.Console.exe"
         $coberturaConverterExe = FindCommand $toolsBaseDirectory "OpenCoverToCoberturaConverter.exe"
         $reportGeneratorExe = FindCommand $toolsBaseDirectory "ReportGenerator.exe"
     } else {
-        Write-Host "Using packaged tools."
+        Write-Verbose "Using packaged tools."
         $openCoverConsoleExe = "$PSScriptRoot\tools\OpenCover\OpenCover.Console.exe"
         $coberturaConverterExe = "$PSScriptRoot\tools\OpenCoverToCoberturaConverter\OpenCoverToCoberturaConverter.exe"
         $reportGeneratorExe = "$PSScriptRoot\tools\ReportGenerator\ReportGenerator.exe"
@@ -96,7 +118,8 @@ try {
     } else {
         $vsconsoleExe = "$env:VS140COMNTOOLS\..\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
     }
-    Write-Host "Using VSTest: $vsconsoleExe"
+
+    Write-Verbose "Using VSTest: $vsconsoleExe"
 
     # resolve test assembly files (copied from VSTest.ps1)
     $testAssemblyFiles = @()
@@ -134,13 +157,6 @@ try {
     # Create tempDir underneath sources so that any publish-artificats task
     # don't pick stuff up accidentally.
     $tempDir = $sourcesDirectory + "\CoverageResults"
-    # if ($runTitle) {
-    #     $tempDir += '\' + $runTitle
-    # }
-    # if (Test-Path $tempDir) {
-    #     Remove-Item -Path $tempDir -Recurse -Force
-    # }
-
     if (-Not (Test-Path $tempDir)) {
         New-Item -Path $tempDir -ItemType Directory | Out-Null
     }
@@ -148,22 +164,27 @@ try {
     if (!$runId) {
         $runId = [Guid]::NewGuid().ToString("N")
     }
+    Write-Verbose "Test run ID is ${runId}."
+
     $trxDir = "$tempDir\$runId"
     if (Test-path $trxDir) {
         Remove-Item -Recurse -Path $trxDir | Out-Null
     }
     New-Item -Path $trxDir -ItemType Directory | Out-Null
     
+    $diagFileName = GetDiagFileName $vsconsoleExe $runId
+    
     $vsconsoleArgs = $testFilesString
     if ($testAdapterPath) { $vsconsoleArgs += " /TestAdapterPath:""$testAdapterPath""" }
     if ($testFilterCriteria) { $vsconsoleArgs += " /TestCaseFilter:""$testFiltercriteria""" }
     if ($runSettingsFile) { $vsconsoleArgs += " /Settings:""$runSettingsFile""" }
+    if ($diagFileName) { $vsconsoleArgs += " /diag:""$diagFileName""" }
     $vsconsoleArgs += " /logger:trx"
-    if ($testAdditionalCommandLine) {
+        if ($testAdditionalCommandLine) {
         $vsconsoleArgs += " "
         $vsconsoleArgs += $testAdditionalCommandLine
     }
-
+    
     if (!$disableCodeCoverage) {
         # According to "https://github.com/OpenCover/opencover/wiki/Usage",
         # "Notes on Spaces in Arguments", to preserve quotes in -targetargs,
@@ -188,6 +209,7 @@ try {
         $openCoverConsoleArgs += " -output:""$openCoverReport"""
         $openCoverConsoleArgs += " -mergebyhash"
         $openCoverConsoleArgs += " -returntargetcode"
+        if (IsDebugEnabled) { $openCoverConsoleArgs += " -log:Debug" }
         if ($openCoverAdditionalCommandLine) {
             $openCoverConsoleArgs += " "
             $openCoverConsoleArgs += $openCoverAdditionalCommandLine
@@ -219,7 +241,8 @@ try {
     }
 
     SendCommand 'results.publish' $testResultParameters ''
-            
+    UploadDiagFile $diagFileName
+    
     if (!$disableCodeCoverage) {
         # Publish code coverage data.
         $codeCoverageParameters = [ordered]@{

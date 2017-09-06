@@ -19,7 +19,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 15
+        "Patch": 22
     },
     "minimumAgentVersion": "1.95.0",
     "instanceNameFormat": "Tests/Coverage - $(testAssembly)",
@@ -145,7 +145,7 @@
             "label": "Path to Custom Test Adapters",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Directory path to custom test adapters. For example, `$(build.SourcesDirectory)\\packages`.",
+            "helpMarkDown": "Directory path to custom test adapters. The folder and all subdirectories are search for adapters. `$(build.sourcesDirectory)\\packages` or `$(build.sourcesDirectory)\\.packages` are considered, if no input is specified.",
             "groupName": "advancedExecutionOptions"
         },
         {

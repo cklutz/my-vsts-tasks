@@ -70,7 +70,7 @@ try {
         }
         $vsTestCommand = $vstestLocation
     } elseif ($vsTestVersion) {
-        Write-Host "Using specified VSTest version: $vsTestVersion"
+        Write-Verbose "Using specified VSTest version: $vsTestVersion"
         if ($vsTestVersion -eq "14.0") {
             $vs14Path = Get-VsVersionFolder -Version $vsTestVersion
             if (!$vs14Path) {
@@ -86,7 +86,7 @@ try {
         if (!$vsTestCommand) {
             # Nothing found, fallback to latest
             $vsPath = Get-LatestVsVersionFolder
-            Write-Host "Latest VS Version in $vsPath"
+            Write-Verbose "Latest VS Version in $vsPath"
             if (!$vsPath) {
                 throw "Specified version '$vsTestVersion' not found. Couldn't find any installed Visual Studio version."
             }
@@ -127,7 +127,7 @@ try {
 } catch {
 
     Write-Host "----------------------------------------------------------------------------"
-    $_ | format-list * -Force
+    $_ | format-list * -Force | Out-Host
     Write-Host "----------------------------------------------------------------------------"
     
     throw $_

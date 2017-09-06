@@ -80,7 +80,7 @@ function Get-InstalledVisualStudioInfo {
         }
 
         # If the type has already been loaded once, then it is not loaded again.
-        Write-Host "Adding Visual Studio setup helpers."
+        Write-Verbose "Adding Visual Studio setup helpers."
         Add-Type -Debug:$false -TypeDefinition @'
 namespace CapabilityHelpers.VisualStudio.Setup
 {
@@ -205,16 +205,16 @@ namespace CapabilityHelpers.VisualStudio.Setup.Com
     }
 }
 '@
-        Write-Host "Getting Visual Studio setup instances."
+        Write-Verbose "Getting Visual Studio setup instances."
         $instances = @( [CapabilityHelpers.VisualStudio.Setup.Instance]::GetInstances() )
-        Write-Host "Found $($instances.Count) instances."
-        Write-Host ($instances | Format-List * | Out-String)
+        Write-Verbose "Found $($instances.Count) instances."
+        Write-Verbose ($instances | Format-List * | Out-String)
         return $instances |
             Where-Object { $_.Version.Major -eq $major } |
             Sort-Object -Descending -Property Version |
             Select-Object -First 1
     } catch {
-        Write-Host ($_ | Out-String)
+        Write-Verbose ($_ | Out-String)
     }
 }
 

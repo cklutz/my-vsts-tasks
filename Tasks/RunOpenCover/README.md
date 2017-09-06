@@ -40,7 +40,7 @@ Use the following options to select tests and control how the tests are run and 
 
 - **Run in Parallel:** If set, tests will run in parallel leveraging available cores of the machine. [Click here](https://aka.ms/paralleltestexecution) to learn more about how tests are run in parallel.
 
-- **OpenCover Filter Criteria:** Filter what should be considered by OpenCover for code coverage. For example, "-\*[\*Tests.\*]".
+- **OpenCover Filter Criteria:** Filter what should be considered by OpenCover for code coverage. For example, "-\*[\*Tests.\*]". [Click here](https://github.com/opencover/opencover/wiki/Usage#understanding-filters) to learn more about how OpenCover filters work.
 
 - **Disable OpenCover:** This allows you to only run the tests and not run OpenCover. Thus, the tasks behaves similar to to stock VSTest task from TFS / VSTS.
 
@@ -48,11 +48,11 @@ Use the following options to select tests and control how the tests are run and 
 
 - **VSTest version:** Choose which version of Visual Studio (vstest.console.exe) to run tests with. 
 
-- **Path to Custom Test Adapters:** Path to the testadapter for the framework in which the specified tests are written. Provided directory and all subdirectories are checked for testadapters. If there is a packages folder in the sources directory, it is automatically searched for testadapters. As a result, any testadapter downloaded as a Nuget package will be used without any input. For example, ‘$(Build.SourcesDirectory)\Fabrikam\packages’
+- **Path to Custom Test Adapters:** Path to the testadapter for the framework in which the specified tests are written. Provided directory and all subdirectories are checked for testadapters. If there is a packages (or .packages) folder in the sources directory, it is automatically searched for testadapters. As a result, any testadapter downloaded as a Nuget package will be used without any input. For example, ‘$(Build.SourcesDirectory)\Fabrikam\packages’
 
 - **Additional VSTest Options:** Other options that can be provided to vstest.console.exe.
 
-- **Additional OpenConver Options:** Other options that can be provided to OpenCover.Console.exe. For example, `-threshold:1 -skipautoprops`.
+- **Additional OpenCover Options:** Other options that can be provided to OpenCover.Console.exe. For example, `-threshold:1 -skipautoprops`.
 
 - **OpenCover Tools:** Choose which version of OpenCover Tools (OpenCover.exe, ReportGenerator.exe and OpenCoverToCoberturaConverter.exe) is used. Either the version packaged with task, or versions located in a common base directory, which can be specified here.
 
