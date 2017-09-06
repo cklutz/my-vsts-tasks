@@ -4,7 +4,7 @@
     "friendlyName": "Run OpenCover",
     "description": "Runs VSTest under OpenCover",
     "author": "Christian Klutz",
-    "helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks/Tasks/RunOpenCover/README.md)",
+    "helpMarkDown": "[More information](https://github.com/cklutz/my-vsts-tasks/blob/master/Tasks/RunOpenCover/README.md)",
     "category": "Test",
     "visibility": [
         "Build"
@@ -19,7 +19,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 8
+        "Patch": 10
     },
     "minimumAgentVersion": "1.95.0",
     "instanceNameFormat": "Tests/Coverage - $(testAssembly)",

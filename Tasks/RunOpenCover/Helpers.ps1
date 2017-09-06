@@ -32,7 +32,7 @@ function Get-LatestVsVersionFolder {
 
     $vs15 = Get-InstalledVisualStudioInfo 15
     if ($vs15 -And $vs15.Path) {
-        Write-Verbose "Version 15.x : $folder"
+        Write-Verbose "Version 15.x : $($vs15.Path)"
         return $vs15.Path
     }
 
