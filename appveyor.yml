@@ -19,17 +19,22 @@ after_build:
 test_script:
   - npm test
 
+artifacts:
+  - path: _package\tasks.zip
+    name: Tasks
+
 deploy:
   # Having "tag" set to the original repo-tag is utterly important, or each
   # build will create a new tag and spawn a new build in consequence - going
   # on endlessly (see http://help.appveyor.com/discussions/problems/3362-deployment-to-github).
   tag: $(appveyor_repo_tag_name)
-  release: chrisk-tasks-v$(appveyor_build_version)
+  # For now, we use the tag name.
+  #release: cklutz-tasks-v$(appveyor_build_version)
   description: 'Custom VSTS/TFS build tasks'
   provider: GitHub
   auth_token:
     secure: JqHA68F4hpk9M0hqTsZjOKE5S12lGEZG8gRZTimIFQ/9L4vY+OAzC3Gs3rEjlPWx
-  artifact: _package/tasks.zip
+  artifact: Tasks
   draft: false
   prerelease: false
   on:
