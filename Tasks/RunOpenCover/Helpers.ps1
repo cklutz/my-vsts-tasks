@@ -50,7 +50,7 @@ function Get-LatestVsVersionFolder {
 function Get-VsVersionFolder {
     [CmdletBinding()]
     param([Parameter(Mandatory = $true)][string]$version)
-    $res = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$version"
+    $res = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$version" -ErrorAction SilentlyContinue
     if ($res -and [bool]($res.PSObject.Properties.Name -match "ShellFolder")) {
         return $res.ShellFolder
     }
